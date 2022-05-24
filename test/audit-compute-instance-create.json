@@ -1,0 +1,192 @@
+{
+  "protoPayload": {
+    "authenticationInfo": {
+      "authoritySelector": null,
+      "principalEmail": "sa-4711@your-project-0815.iam.gserviceaccount.com",
+      "principalSubject": null,
+      "serviceAccountDelegationInfo": [{
+          "firstPartyPrincipal": {
+            "principalEmail": "sa-4711your-project-0815.iam.gserviceaccount.com"
+          },
+          "principalSubject": null
+        },
+        {
+          "firstPartyPrincipal": {
+            "principalEmail": "sa-4711@compute-system.iam.gserviceaccount.com"
+          },
+          "principalSubject": null
+        }
+      ],
+      "serviceAccountKeyName": null
+    },
+    "authorizationInfo": [{
+        "granted": "true",
+        "permission": "compute.instances.create",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/zones/europe-west3-b/instances/instance-name",
+          "service": "compute",
+          "type": "compute.instances",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.disks.create",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/zones/europe-west3-b/disks/disk-name",
+          "service": "compute",
+          "type": "compute.disks",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.subnetworks.use",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/regions/europe-west3/subnetworks/subnet-project-id",
+          "service": "compute",
+          "type": "compute.subnetworks",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.addresses.useInternal",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/regions/europe-west3/addresses/instance-name-nic0",
+          "service": "compute",
+          "type": "compute.addresses",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.instances.setMetadata",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/zones/europe-west3-b/instances/instance-name",
+          "service": "compute",
+          "type": "compute.instances",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.instances.setTags",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/zones/europe-west3-b/instances/instance-name",
+          "service": "compute",
+          "type": "compute.instances",
+          "uid": null,
+          "updateTime": null
+        }
+      },
+      {
+        "granted": "true",
+        "permission": "compute.instances.setLabels",
+        "resource": null,
+        "resourceAttributes": {
+          "annotations": [],
+          "createTime": null,
+          "deleteTime": null,
+          "displayName": null,
+          "etag": null,
+          "labels": [],
+          "location": null,
+          "name": "projects/network-project-id/zones/europe-west3-b/instances/instance-name",
+          "service": "compute",
+          "type": "compute.instances",
+          "uid": null,
+          "updateTime": null
+        }
+      }
+    ],
+    "metadataJson": null,
+    "methodName": "beta.compute.instances.insert",
+    "numResponseItems": null,
+    "policyViolationInfo": null,
+    "requestJson": "{\"@type\":\"type.googleapis.com/compute.instances.insert\"}",
+    "requestMetadata": {
+      "callerIp": "10.2.0.3",
+      "callerNetwork": "//compute.googleapis.com/projects/your-project-0815/global/networks/__unknown__",
+      "callerSuppliedUserAgent": "google-api-go-client/0.5 Terraform/1.1.6 (+https://www.terraform.io) Terraform-Plugin-SDK/2.5.0 terraform-provider-google-beta/3.90.1,gzip(gfe)",
+      "destinationAttributes": null,
+      "requestAttributes": {
+        "auth": null,
+        "headers": [],
+        "host": null,
+        "id": null,
+        "method": null,
+        "path": null,
+        "protocol": null,
+        "query": null,
+        "reason": null,
+        "scheme": null,
+        "size": null,
+        "time": "2021-04-11 08:08:26"
+      }
+    },
+    "resourceLocation": {
+      "currentLocations": [
+        "europe-west3-b"
+      ],
+      "originalLocations": []
+    },
+    "resourceName": "projects/network-project-id/zones/europe-west3-b/instances/instance-name",
+    "responseJson": "{}",
+    "serviceName": "compute.googleapis.com",
+    "status": null
+  }
+}
