@@ -22,6 +22,7 @@ this directory:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| organization\_id | The organization ID to which resources will be applied. | `string` | `"override in terraform.tfvars"` | no |
 | project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
 | region | The region in which resources will be applied. | `string` | n/a | yes |
 
@@ -29,7 +30,7 @@ this directory:
 
 | Name | Description |
 |------|-------------|
-| function\_name | The name of the Cloud Funtion. |
+| function\_name | The name of the Cloud Function. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

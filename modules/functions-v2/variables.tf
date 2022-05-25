@@ -23,9 +23,8 @@ variable "environment_variables" {
 }
 
 variable "event_trigger" {
-  type        = map(string)
-  default     = {}
-  description = "A source that fires events in response to a condition in another service."
+  type        = string
+  description = "The resource name of the Eventarc trigger."
 }
 
 variable "trigger_http" {

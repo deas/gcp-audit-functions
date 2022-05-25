@@ -15,11 +15,21 @@ Disclaimer: Code mostly borrowed from `terraform-google-event-function`.
 ...
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Inputs
-TODO: Rebuild
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| filter | The filter to apply when exporting logs. | `string` | n/a | yes |
+| include\_children | Determines whether or not to include folder's children in the sink export. If true, logs associated with child projects are also exported; otherwise only logs relating to the provided folder are included. | `bool` | `true` | no |
+| labels | A set of key/value label pairs to assign to any labelable resources. | `map(string)` | `{}` | no |
+| name | The name to apply to any nameable resources. | `string` | n/a | yes |
+| organization\_id | The ID of the organization to look for changes. | `string` | n/a | yes |
+| project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
 
 ## Outputs
 
-TODO: Rebuild
+| Name | Description |
+|------|-------------|
+| function\_event\_trigger | The information used to trigger the function when a log entry is exported to the topic. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

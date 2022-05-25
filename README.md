@@ -1,6 +1,6 @@
-# GCP Cloud Functions labeling Resources based on Audit Events
+# GCP Cloud Functions triggered by Audit Events
 
-This project aims to provide audit event triggered Cloud Functions which label resources. This funtionality is provided as a `terraform` module. For the moment we focus on the `creator` tag.
+This project aims to provide audit event triggered Cloud Functions.  This funtionality is provided as a `terraform` module. It started with the common `creator` labeling use case but we now aim to extend the scope.
 
 The v1 version leverages a PubSub Log Sink, 🧪 v2 🥼 is based on EventArc/CloudEvents.
 
@@ -81,6 +81,8 @@ Read Audit Logs from StackDriver
 ```shell
 gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog" protoPayload.methodName:insert operation.first=true' --project ${PROJECT_ID} --format json
 ```
+# Known Issues
+- Go workspaces are recommended for best DX with `gopls` : [x/tools/gopls: support multi-module workspaces #32394](https://github.com/golang/go/issues/32394) / [Setting up your workspace](https://github.com/golang/tools/blob/master/gopls/doc/workspace.md#go-workspaces-go-118)
 # References
 - [Functions Framework for Go](https://github.com/GoogleCloudPlatform/functions-framework-go)
 - [Go SDK for CloudEvents](https://github.com/cloudevents/sdk-go).
@@ -91,3 +93,4 @@ gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.
 - [Cross Project Eventing](https://github.com/GoogleCloudPlatform/eventarc-samples/tree/main/cross-project-eventing)
 - [Calling Cloud Functions (v1)](https://cloud.google.com/functions/docs/calling)
 - [`golang-samples/functions/functionsv2`](https://github.com/GoogleCloudPlatform/golang-samples/tree/main/functions/functionsv2)
+- [Cloud Foundation Toolkit Project](https://github.com/GoogleCloudPlatform/cloud-foundation-toolkit)

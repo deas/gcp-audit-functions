@@ -14,9 +14,6 @@ require (
 
 require (
 	cdr.dev/slog v1.4.1
-	cloud.google.com/go/iam v0.3.0 // indirect
-	cloud.google.com/go/kms v1.4.0 // indirect
-	cloud.google.com/go/pubsub v1.3.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.11.0
 )

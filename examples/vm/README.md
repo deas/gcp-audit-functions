@@ -17,8 +17,9 @@ this directory:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| image | The image to use for the compute instance. | `string` | `"debian-cloud/debian-9"` | no |
+| machine\_type | The machine type to use for the compute instance. | `string` | `"f1-micro"` | no |
 | project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
-| region | The region in which resources will be applied. | `string` | n/a | yes |
 | subnetwork | The name or self\_link of the subnetwork to create compute instance in. | `string` | `"default"` | no |
 | zone | The zone in which resources will be applied. | `string` | n/a | yes |
 

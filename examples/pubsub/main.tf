@@ -29,16 +29,13 @@ module "function" {
 }
 
 module "audit_label" {
-  source  = "terraform-google-modules/event-function/google"
-  version = "2.3.0"
-
+  source      = "terraform-google-modules/event-function/google"
+  version     = "2.3.0"
   description = "Labels resource with owner information."
   entry_point = module.function.v1_entry_point
-
-  environment_variables = {
-    LABEL_KEY = "principal-email"
-  }
-
+  #environment_variables = {
+  #  LABEL_KEY = "principal-email"
+  #}
   event_trigger                  = module.event_log_entry.function_event_trigger
   name                           = "audit-label-${random_pet.main.id}"
   project_id                     = var.project_id

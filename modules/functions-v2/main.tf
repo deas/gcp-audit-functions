@@ -90,9 +90,10 @@ resource "google_cloudfunctions2_function" "main" {
     all_traffic_on_latest_revision = true
   }
 
-  event_trigger {               # TODO
+  event_trigger {
+    trigger        = var.event_trigger
     trigger_region = var.region #"us-central1"
-    # event_type - (Optional) Required. The type of event to observe.
+    #  event_type - (Optional) Required. The type of event to observe.
     #  event_type = "google.cloud.pubsub.topic.v1.messagePublished"
     #  pubsub_topic = google_pubsub_topic.sub.id
     retry_policy = "RETRY_POLICY_RETRY"
