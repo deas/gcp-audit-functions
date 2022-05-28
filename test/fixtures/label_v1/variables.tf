@@ -13,7 +13,7 @@ variable "region" {
   description = "The region in which resources will be applied."
 }
 
-variable "organization_id" {
+variable "org_id" {
   type        = string
   description = "The ID of the organization to which resources will be applied."
 }

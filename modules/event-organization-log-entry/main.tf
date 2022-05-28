@@ -26,7 +26,7 @@ module "log_export" {
   destination_uri        = local.destination_uri
   filter                 = var.filter
   log_sink_name          = var.name
-  parent_resource_id     = var.organization_id
+  parent_resource_id     = var.org_id
   include_children       = var.include_children
   parent_resource_type   = "organization"
   unique_writer_identity = "true"

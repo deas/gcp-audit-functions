@@ -1,13 +1,13 @@
 # GCP Cloud Functions triggered by Audit Events
 
-This project aims to provide audit event triggered Cloud Functions.  This funtionality is provided as a `terraform` module. It started with the common `creator` labeling use case but we now aim to extend the scope.
+This project aims to provide audit event triggered Cloud Functions. The functionality is provided as a `terraform` module.
 
-The v1 version leverages a PubSub Log Sink, 🧪 v2 🥼 is based on EventArc/CloudEvents.
+The v1 versions leverage PubSub Log Sinks, 🧪 v2 🥼 is based on EventArc/CloudEvents.
 
-We tried hard to borrow from people committed to maintainance (Google) and extended where we wanted to go further - or connect the dots.
+We try hard to build upon people committed to maintainance (mostly CFT by Google). We stripped where possible, extended where we wanted to go further or connected the dots.
 
 ## Usage
-Sample Cloud Function and VM deployments designed to play together are provided in the `examples` folder.
+Sample Cloud Function and VM deployments designed to play together are provided in the `examples` folder. Unless explicitly disabled, they are also used by the integration tests.
 
 You may want to
 ```shell
@@ -26,18 +26,18 @@ to get proper access when trying them out.
 | <a name="output_v2_entry_point"></a> [v2\_entry\_point](#output\_v2\_entry\_point) | The v2 function entry point |
 
 ## Development
-Implementations are currently Go based and we use [Functions Framework for Go](https://github.com/GoogleCloudPlatform/functions-framework-go) during development.
+There are various `Makefile` targets providing entrypoints for CI and steps you might want to do during development.
 
+Cloud Function implementations are currently Go based and we use [Functions Framework for Go](https://github.com/GoogleCloudPlatform/functions-framework-go) during development.
 
 Start local service
 ```shell
-cd fn
 # export FUNCTION_TARGET=LabelPubSub # Not needed atm
 # export GCP_AUDIT_LABEL_READ_ONLY=1 # If you want read only access to GCP 
-go run cmd/main.go
+make serve
 ```
 
-Send PubSub payload to local service
+Send PubSub payload to local label Function
 ```shell
 message=test/audit-compute-instance-create.json
 endpoint=http://localhost:8080/label-pubsub
@@ -51,7 +51,7 @@ cat <<EOF | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
 EOF
 ```
 
-Send CloudEvent payload to local service
+Send CloudEvent payload to local Function
 ```shell
 message=test/audit-compute-instance-create.json
 endpoint=http://localhost:8080/label-event
@@ -68,7 +68,7 @@ cat <<EOF | curl -d @- -X POST -H "Content-Type: application/cloudevents+json" "
 EOF
 ```
 
-Send PubSub payload to Cloud Function via topic.
+Send PubSub payload to Cloud Function via Topic.
 
 ```shell
 PROJECT_ID=your-prj-id
@@ -79,7 +79,7 @@ gcloud --project ${PROJECT_ID} pubsub topics audit-label --message '{ "fix": "me
 
 Read Audit Logs from StackDriver
 ```shell
-gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog" protoPayload.methodName:insert operation.first=true' --project ${PROJECT_ID} --format json
+gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog"' --freshness=1h --project ${PROJECT_ID} --format json
 ```
 # Known Issues
 - Go workspaces are recommended for best DX with `gopls` : [x/tools/gopls: support multi-module workspaces #32394](https://github.com/golang/go/issues/32394) / [Setting up your workspace](https://github.com/golang/tools/blob/master/gopls/doc/workspace.md#go-workspaces-go-118)
@@ -94,3 +94,5 @@ gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.
 - [Calling Cloud Functions (v1)](https://cloud.google.com/functions/docs/calling)
 - [`golang-samples/functions/functionsv2`](https://github.com/GoogleCloudPlatform/golang-samples/tree/main/functions/functionsv2)
 - [Cloud Foundation Toolkit Project](https://github.com/GoogleCloudPlatform/cloud-foundation-toolkit)
+- [IAM audit logging ](https://cloud.google.com/iam/docs/audit-logging)
+- [Audit logs for service accounts](https://cloud.google.com/iam/docs/audit-logging/examples-service-accounts)

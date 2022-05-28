@@ -1,4 +1,4 @@
-# GCP Audit Labeling - PubSub Example
+# GCP Audit Service Account Hardening - PubSub Example
 
 This example demonstrates how to use the
 [root module][root-module] and the
@@ -22,7 +22,7 @@ this directory:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| organization\_id | The organization ID to which resources will be applied. | `string` | `"override in terraform.tfvars"` | no |
+| org\_id | The organization ID to which resources will be applied. | `string` | `"override in terraform.tfvars"` | no |
 | project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
 | region | The region in which resources will be applied. | `string` | n/a | yes |
 
@@ -54,14 +54,14 @@ from which this module will be invoked:
 The Service Account which will be used to invoke this module must have
 the following IAM roles:
 
-- Compute Instance Admin (v1): `roles/compute.instanceAdmin.v1`
+- TODO: Compute Instance Admin (v1): `roles/compute.instanceAdmin.v1`
 
 ### APIs
 
 The project against which this module will be invoked must have the
 following APIs enabled:
 
-- Compute Engine API: `compute.googleapis.com`
+- TODO: Compute Engine API: `compute.googleapis.com`
 
 [event-project-log-entry-submodule-requirements]: ../../modules/event-project-log-entry/README.md#requirements
 [event-project-log-entry-submodule]: ../../modules/event-project-log-entry

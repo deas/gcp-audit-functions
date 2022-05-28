@@ -19,7 +19,7 @@ variable "project_id" {
   description = "The ID of the project to which resources will be applied."
 }
 
-variable "organization_id" {
+variable "org_id" {
   type        = string
   description = "The ID of the organization to look for changes."
 }

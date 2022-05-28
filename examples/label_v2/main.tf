@@ -1,3 +1,6 @@
+locals {
+  name = "audit-label"
+}
 resource "random_pet" "main" {
   separator = "-"
 }
@@ -20,7 +23,7 @@ gcloud alpha functions deploy gce-vm-labeler \
 */
 
 resource "google_eventarc_trigger" "main" {
-  name     = "audit-label-${random_pet.main.id}"
+  name     = "${local.name}-${random_pet.main.id}"
   location = var.region
   matching_criteria {
     attribute = "type"
@@ -41,7 +44,7 @@ module "audit_label" {
   #  LABEL_KEY = "principal-email"
   #}
   event_trigger                  = google_eventarc_trigger.main.name
-  name                           = "audit-label-${random_pet.main.id}"
+  name                           = "${local.name}-${random_pet.main.id}"
   project_id                     = var.project_id
   region                         = var.region
   source_directory               = module.function.path

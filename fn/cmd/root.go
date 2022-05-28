@@ -35,6 +35,9 @@ var rootCmd = &cobra.Command{
 		if err := funcframework.RegisterEventFunctionContext(ctx, "/label-pubsub", function.LabelPubSub); err != nil {
 			log.Fatal(ctx, "funcframework.RegisterEventFunctionContext") //: %v\n", err)
 		}
+		if err := funcframework.RegisterEventFunctionContext(ctx, "/harden-pubsub", function.HardenPubSub); err != nil {
+			log.Fatal(ctx, "funcframework.RegisterEventFunctionContext") //: %v\n", err)
+		}
 		// Use PORT environment variable, or default to 8080.
 		port := "8080"
 		if envPort := os.Getenv("PORT"); envPort != "" {

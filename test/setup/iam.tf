@@ -38,7 +38,7 @@ locals {
     "roles/owner",
   ]
 }
-
+/*
 resource "google_service_account" "int_test" {
   project      = module.project.project_id
   account_id   = "ci-account"
@@ -72,3 +72,4 @@ resource "google_folder_iam_member" "int_test_sub_folder_cloud_function" {
 resource "google_service_account_key" "int_test" {
   service_account_id = google_service_account.int_test.id
 }
+*/

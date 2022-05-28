@@ -24,6 +24,14 @@ output "v2_entry_point" {
   value       = "LabelEvent"
 }
 
+output "entry_points_v1" {
+  description = "The v1 function entry points provided by this module"
+  value = {
+    label     = "LabelPubSub"
+    harden_sa = "HardenPubSub"
+  }
+}
+
 output "runtime" {
   description = "The runtime"
   value       = "go116"

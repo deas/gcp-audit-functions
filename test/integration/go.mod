@@ -1,4 +1,4 @@
-module github.com/terraform-google-modules/terraform-google-event-function/test/integration
+module github.com/deas/gcp-audit-label/test/integration
 
 go 1.16
 

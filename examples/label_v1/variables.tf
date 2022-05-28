@@ -8,8 +8,17 @@ variable "region" {
   description = "The region in which resources will be applied."
 }
 
-variable "organization_id" {
+variable "org_id" {
   type        = string
   description = "The organization ID to which resources will be applied."
   default     = "override in terraform.tfvars"
+}
+
+variable "vm" {
+  type = object({
+    zone       = string
+    subnetwork = string
+  })
+  description = "VM spec - zone and subnetwork. Null to disable"
+  default     = null
 }

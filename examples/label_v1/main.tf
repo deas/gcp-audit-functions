@@ -1,16 +1,33 @@
+locals {
+  name = "audit-label"
+}
+
 resource "random_pet" "main" {
   separator = "-"
+}
+
+module "vm" {
+  source     = "../../examples/vm"
+  project_id = var.project_id
+  zone       = var.vm.zone
+  subnetwork = var.vm.subnetwork
+  count      = var.vm != null ? 1 : 0
+  depends_on = [module.audit_label]
+  #filter          = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" protoPayload.methodName:insert operation.first=true"
+  #name            = "${local.name}-${random_pet.main.id}"
+  #project_id      = var.project_id
+  #org_id = var.org_id
 }
 
 # TODO: Delegates to
 # https://github.com/terraform-google-modules/terraform-google-log-export
 # Event function submodules also support folders - but not organization
 module "event_log_entry" {
-  source          = "../../modules/event-organization-log-entry"
-  filter          = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" protoPayload.methodName:insert operation.first=true"
-  name            = random_pet.main.id
-  project_id      = var.project_id
-  organization_id = var.organization_id
+  source     = "../../modules/event-organization-log-entry"
+  filter     = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" protoPayload.methodName:insert operation.first=true"
+  name       = "${local.name}-${random_pet.main.id}"
+  project_id = var.project_id
+  org_id     = var.org_id
 }
 
 /*
@@ -18,7 +35,7 @@ module "event_log_entry" {
   source     = "terraform-google-modules/event-function/google//modules/event-project-log-entry"
   version    = "2.3.0"
   filter     = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" protoPayload.methodName:insert operation.first=true"
-  name       = random_pet.main.id
+  name       = "${local.name}-${random_pet.main.id}"
   project_id = var.project_id
 }
 */
@@ -37,7 +54,7 @@ module "audit_label" {
   #  LABEL_KEY = "principal-email"
   #}
   event_trigger                  = module.event_log_entry.function_event_trigger
-  name                           = "audit-label-${random_pet.main.id}"
+  name                           = "${local.name}-${random_pet.main.id}"
   project_id                     = var.project_id
   region                         = var.region
   source_directory               = module.function.path
