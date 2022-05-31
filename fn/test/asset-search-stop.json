@@ -1,0 +1,5 @@
+{
+  "scope": "organizations/your-org-id",
+  "query": "labels.stop_daily:true AND state:RUNNING",
+  "assetTypes": ["compute.googleapis.com/Instance"]
+}

@@ -1,10 +1,18 @@
-# GCP Cloud Functions triggered by Audit Events
+# GCP Cloud Functions driven by Schedule and Audit Events
 
-This project aims to provide audit event triggered Cloud Functions. The functionality is provided as a `terraform` module.
+This project aims to provide generic schedule and audit event driven Cloud Functions.
+
+Functionality currently covers:
+
+- Labeling GCE instances on creation
+- Hardening the Compute Default account (revoking `role/editor`)
+- Start and Stop GCE instances based on Asset Search
+
+More hopefully coming soon.
+
+Additionally, we aim at decent support for the larger product lifecyle with an emphasis on a DevOps experience including short cycle times. We leverage Cloud Foundation Toolkit, Cloud Functions Framework, GitHub Actions and Terraform. We cover unit- and integration testing. We stripped dependencies where reasonable and extended where we wanted to go further or connected the dots.
 
 The v1 versions leverage PubSub Log Sinks, 🧪 v2 🥼 is based on EventArc/CloudEvents.
-
-We try hard to build upon people committed to maintainance (mostly CFT by Google). We stripped where possible, extended where we wanted to go further or connected the dots.
 
 ## Usage
 Sample Cloud Function and VM deployments designed to play together are provided in the `examples` folder. Unless explicitly disabled, they are also used by the integration tests.
@@ -33,14 +41,15 @@ Cloud Function implementations are currently Go based and we use [Functions Fram
 Start local service
 ```shell
 # export FUNCTION_TARGET=LabelPubSub # Not needed atm
-# export GCP_AUDIT_LABEL_READ_ONLY=1 # If you want read only access to GCP 
+# export GCP_HOUSEKEEPER_READ_ONLY=1 # If you want read only access to GCP 
+export GCP_HOUSEKEEPER_FUNCTION=StartPubSub # Framework workaround atm
 make serve
 ```
 
-Send PubSub payload to local label Function
+Send PubSub payload to local Label Function
 ```shell
 message=test/audit-compute-instance-create.json
-endpoint=http://localhost:8080/label-pubsub
+endpoint=http://localhost:8080 # Issue with framework : Only one endpoint per process
 
 cat <<EOF | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}" 
 {
@@ -51,10 +60,10 @@ cat <<EOF | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
 EOF
 ```
 
-Send CloudEvent payload to local Function
+Send CloudEvent payload to local Label Function
 ```shell
 message=test/audit-compute-instance-create.json
-endpoint=http://localhost:8080/label-event
+endpoint=http://localhost:8080
 cat <<EOF | curl -d @- -X POST -H "Content-Type: application/cloudevents+json" "${endpoint}" \
 {
 	"specversion" : "1.0",
@@ -81,8 +90,37 @@ Read Audit Logs from StackDriver
 ```shell
 gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog"' --freshness=1h --project ${PROJECT_ID} --format json
 ```
+
+Send PubSub payload to local Start/Stop Function
+```shell
+endpoint=http://localhost:8080
+scope=organizations/your-org-id
+
+echo '{"data": "'$(echo '
+{
+    "scope": "'$scope'",
+    "query": "labels.start_daily:true AND state:TERMINATED",
+    "assetTypes": ["compute.googleapis.com/Instance"]
+}' | base64 -w 0)'"}' | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
+
+echo '{"data": "'$(echo '
+{
+    "scope": "'$scope'",
+    "query": "labels.stop_daily:true AND state:RUNNING",
+    "assetTypes": ["compute.googleapis.com/Instance"]
+}' | base64 -w 0)'"}' | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
+
+```
+
+There is a generic `main` entrypoint for the Go implementations which allows one to call functionality straight from the command line. Try
+```shell
+cd fn
+go run main/main.go --help
+```
+to see what is available.
 # Known Issues
 - Go workspaces are recommended for best DX with `gopls` : [x/tools/gopls: support multi-module workspaces #32394](https://github.com/golang/go/issues/32394) / [Setting up your workspace](https://github.com/golang/tools/blob/master/gopls/doc/workspace.md#go-workspaces-go-118)
+- [Serving multiple functions locally from a single server instance #109](https://github.com/GoogleCloudPlatform/functions-framework-go/issues/109)
 # References
 - [Functions Framework for Go](https://github.com/GoogleCloudPlatform/functions-framework-go)
 - [Go SDK for CloudEvents](https://github.com/cloudevents/sdk-go).

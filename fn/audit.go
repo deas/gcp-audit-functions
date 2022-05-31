@@ -7,13 +7,12 @@ import (
 	"cdr.dev/slog"
 	"cdr.dev/slog/sloggers/sloghuman"
 	"cdr.dev/slog/sloggers/slogstackdriver"
-	"google.golang.org/api/option"
 )
 
 var (
 	readOnly  bool
-	EnvPrefix = "GCP_AUDIT_LABEL"
-	log       slog.Logger
+	EnvPrefix = "GCP_HOUSEKEEPER"
+	logger    slog.Logger
 )
 
 // https://gist.github.com/salrashid123/62178224324ccbc80a358920d5281a60
@@ -47,17 +46,4 @@ func NewLogger() slog.Logger {
 	} else {
 		return slog.Make(slogstackdriver.Sink(os.Stdout))
 	}
-}
-
-func NewOpts() []option.ClientOption {
-	var opts []option.ClientOption
-	// Don't up in Pipeline : google: could not find default credentials.
-	if _, noAuth := os.LookupEnv(fmt.Sprintf("%s_%s", EnvPrefix, "NO_AUTH")); noAuth {
-		opts = []option.ClientOption{
-			option.WithoutAuthentication(),
-		}
-	} else {
-		opts = []option.ClientOption{}
-	}
-	return opts
 }

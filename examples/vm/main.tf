@@ -14,6 +14,11 @@ resource "google_compute_instance" "main" {
   name         = "unlabelled-${random_pet.main.id}"
   zone         = var.zone
 
+  labels = {
+    start_daily = "true"
+    stop_daily  = "true"
+  }
+
   lifecycle {
     ignore_changes = [
       labels,

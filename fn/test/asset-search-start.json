@@ -1,0 +1,5 @@
+{
+  "scope": "organizations/your-org-id",
+  "query": "labels.start_daily:true AND state:TERMINATED",
+  "assetTypes": ["compute.googleapis.com/Instance"]
+}

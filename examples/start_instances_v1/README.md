@@ -1,6 +1,11 @@
-# GCP Audit Labeling - VM Creation
+# GCP Scheduled GCE Instance Start - PubSub Example
 
-This example demonstrates creates a sample Compute VM
+This example demonstrates how to use the
+[root module][root-module] and the
+[event-project-log-entry submodule][event-project-log-entry-submodule]
+to configure a system
+which responds to Compute VM creation events by labelling them with the
+principal email address of the account responsible for causing the events.
 
 ## Usage
 
@@ -17,17 +22,20 @@ this directory:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| image | The image to use for the compute instance. | `string` | `"debian-cloud/debian-9"` | no |
-| machine\_type | The machine type to use for the compute instance. | `string` | `"f1-micro"` | no |
+| org\_id | The organization ID to which resources will be applied. | `string` | `"override in terraform.tfvars"` | no |
 | project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
-| subnetwork | The name or self\_link of the subnetwork to create compute instance in. | `string` | n/a | yes |
-| zone | The zone in which resources will be applied. | `string` | n/a | yes |
+| region | The region in which resources will be applied. | `string` | n/a | yes |
+| schedule | The schedule | `string` | `"0 1 * * *"` | no |
+| search | The asset search | `string` | `"{\n  \"scope\": \"organizations/your-org-id\",\n  \"query\": \"labels.start_daily:true AND state:TERMINATED\",\n  \"assetTypes\": [\"compute.googleapis.com/Instance\"]\n}\n"` | no |
+| vm | VM spec - zone and subnetwork. Null to disable | <pre>object({<br>    zone       = string<br>    subnetwork = string<br>  })</pre> | `null` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| compute\_instance\_name | The name of the unlabelled Compute instance. |
+| function\_name | The name of the function created |
+| project\_id | The project in which resources are applied. |
+| region | The region in which resources are applied. |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 

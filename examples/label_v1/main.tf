@@ -13,10 +13,6 @@ module "vm" {
   subnetwork = var.vm.subnetwork
   count      = var.vm != null ? 1 : 0
   depends_on = [module.audit_label]
-  #filter          = "protoPayload.@type=\"type.googleapis.com/google.cloud.audit.AuditLog\" protoPayload.methodName:insert operation.first=true"
-  #name            = "${local.name}-${random_pet.main.id}"
-  #project_id      = var.project_id
-  #org_id = var.org_id
 }
 
 # TODO: Delegates to
@@ -63,6 +59,7 @@ module "audit_label" {
   runtime                        = module.function.runtime
 }
 
+/* Hopefully no longer needed
 resource "null_resource" "wait_for_function" {
   provisioner "local-exec" {
     command = "sleep 60"
@@ -70,3 +67,4 @@ resource "null_resource" "wait_for_function" {
 
   depends_on = [module.audit_label]
 }
+*/

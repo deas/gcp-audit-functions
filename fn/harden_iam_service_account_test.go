@@ -16,14 +16,14 @@ package function
 
 import (
 	"context"
-	stdlog "log"
+	"log"
 	"testing"
 
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/iam/v1"
 )
 
-func TestQuickstart(t *testing.T) {
+func TestServiceAccount(t *testing.T) {
 	/*
 		tc := testutil.SystemTest(t)
 		m := testutil.BuildMain(t)
@@ -56,15 +56,14 @@ func TestQuickstart(t *testing.T) {
 	*/
 }
 
-// createServiceAccount creates a service account.
 func createServiceAccount(projectID, name, displayName string) *iam.ServiceAccount {
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
-		stdlog.Fatalf("google.DefaultClient: %v", err)
+		log.Fatalf("google.DefaultClient: %v", err)
 	}
 	service, err := iam.New(client)
 	if err != nil {
-		stdlog.Fatalf("iam.New: %v", err)
+		log.Fatalf("iam.New: %v", err)
 	}
 
 	request := &iam.CreateServiceAccountRequest{
@@ -75,7 +74,7 @@ func createServiceAccount(projectID, name, displayName string) *iam.ServiceAccou
 	}
 	account, err := service.Projects.ServiceAccounts.Create("projects/"+projectID, request).Do()
 	if err != nil {
-		stdlog.Fatalf("Projects.ServiceAccounts.Create: %v", err)
+		log.Fatalf("Projects.ServiceAccounts.Create: %v", err)
 	}
 	return account
 }
@@ -84,15 +83,15 @@ func createServiceAccount(projectID, name, displayName string) *iam.ServiceAccou
 func deleteServiceAccount(email string) {
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
-		stdlog.Fatalf("google.DefaultClient: %v", err)
+		log.Fatalf("google.DefaultClient: %v", err)
 	}
 	service, err := iam.New(client)
 	if err != nil {
-		stdlog.Fatalf("iam.New: %v", err)
+		log.Fatalf("iam.New: %v", err)
 	}
 
 	_, err = service.Projects.ServiceAccounts.Delete("projects/-/serviceAccounts/" + email).Do()
 	if err != nil {
-		stdlog.Fatalf("Projects.ServiceAccounts.Delete: %v", err)
+		log.Fatalf("Projects.ServiceAccounts.Delete: %v", err)
 	}
 }

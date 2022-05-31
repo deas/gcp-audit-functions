@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
 env:
-  GCP_AUDIT_LABEL_NO_AUTH: 1
+  GCP_HOUSEKEEPER_NO_AUTH: 1
 
 jobs:
 

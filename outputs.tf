@@ -27,8 +27,10 @@ output "v2_entry_point" {
 output "entry_points_v1" {
   description = "The v1 function entry points provided by this module"
   value = {
-    label     = "LabelPubSub"
-    harden_sa = "HardenPubSub"
+    label           = "LabelPubSub"
+    harden_sa       = "HardenPubSub"
+    start_instances = "StartPubSub"
+    stop_instances  = "StopPubSub"
   }
 }
 

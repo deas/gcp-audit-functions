@@ -9,8 +9,9 @@ import (
 	"strings"
 
 	compute "cloud.google.com/go/compute/apiv1"
-	"github.com/cloudevents/sdk-go/v2/event"
 	computepb "google.golang.org/genproto/googleapis/cloud/compute/v1"
+
+	"github.com/cloudevents/sdk-go/v2/event"
 
 	// https://gist.github.com/salrashid123/62178224324ccbc80a358920d5281a60
 	"google.golang.org/protobuf/proto"
@@ -21,44 +22,44 @@ var (
 )
 
 func init() {
-	log = NewLogger()
+	logger = NewLogger()
 	var err error
 	client, err = compute.NewInstancesRESTClient(context.Background(), NewOpts()...)
 	if err != nil {
-		log.Fatal(context.Background(), fmt.Sprintf("Failed to create instances client : %v", err))
+		logger.Fatal(context.Background(), fmt.Sprintf("Failed to create instances client : %v", err))
 	}
 	_, readOnly = os.LookupEnv(fmt.Sprintf("%s_%s", EnvPrefix, "READ_ONLY"))
 }
 
 func LabelPubSub(ctx context.Context, m PubSubMessage /* pubsub.Message*/) error {
-	log.Info(ctx, "Got PubSub message") // , m.ID /*string(m.Data)*/)) // Automatically decoded from base64
+	logger.Info(ctx, "Got PubSub message") // , m.ID /*string(m.Data)*/)) // Automatically decoded from base64
 	logentry := &AuditLogEntry{}
 	// logentry := &audit.AuditLog{}
 	// var auditLogEntry AuditLogEntry
 	err := json.Unmarshal(m.Data, &logentry)
 	if err != nil {
-		log.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
+		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
 	}
 	return label(ctx, *logentry.ProtoPayload, fmt.Sprintf("%s/%s", logentry.ProtoPayload.ServiceName, logentry.ProtoPayload.ResourceName))
 }
 
 func LabelEvent(ctx context.Context, ev event.Event) error {
-	log.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
+	logger.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
 	logentry := &AuditLogEntry{}
 	if err := ev.DataAs(logentry); err != nil {
-		return fmt.Errorf("Error parsing event payload : %w", err)
+		return fmt.Errorf("error parsing event payload : %w", err)
 	}
 	return label(ctx, *logentry.ProtoPayload, ev.Subject())
 }
 
 // Receives GCE instance creation Audit Logs, and adds a `creator` label to the instance.
 func label(ctx context.Context, payload AuditLogProtoPayload, subject string) error {
-	log.Info(ctx, fmt.Sprintf("Got MethodName %s", payload.MethodName))
+	logger.Info(ctx, fmt.Sprintf("Got MethodName %s", payload.MethodName))
 
 	creator, ok := payload.AuthenticationInfo["principalEmail"]
 	if !ok {
 		err := fmt.Errorf("principalEmail not found in cloud event payload: %v", payload)
-		log.Info(ctx, fmt.Sprintf("Creator email not found: %s", err))
+		logger.Info(ctx, fmt.Sprintf("Creator email not found: %s", err))
 		return err
 	}
 
@@ -87,11 +88,11 @@ func label(ctx context.Context, payload AuditLogProtoPayload, subject string) er
 		Instance: instance,
 	})
 	if err != nil {
-		return fmt.Errorf("Could not retrieve GCE instance: %s", err)
+		return fmt.Errorf("could not retrieve GCE instance: %s", err)
 	}
 	if v, ok := inst.Labels["creator"]; ok {
 		// Instance already has a creator label.
-		log.Info(ctx, fmt.Sprintf("Instance %s already labeled with creator: %s", instance, v))
+		logger.Info(ctx, fmt.Sprintf("Instance %s already labeled with creator: %s", instance, v))
 		return nil
 	}
 
@@ -111,9 +112,9 @@ func label(ctx context.Context, payload AuditLogProtoPayload, subject string) er
 		if err != nil {
 			return err // log.Fatalf("Could not label GCE instance: %s", err)
 		}
-		log.Info(ctx, fmt.Sprintf("Creator label added to %s in operation %v", instance, op))
+		logger.Info(ctx, fmt.Sprintf("Creator label added to %s in operation %v", instance, op))
 	} else {
-		log.Info(ctx, fmt.Sprintf("Creator label not added to %s - read only", instance))
+		logger.Info(ctx, fmt.Sprintf("Creator label not added to %s - read only", instance))
 	}
 	return nil
 }

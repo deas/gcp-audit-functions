@@ -53,6 +53,7 @@ module "harden_sa" {
   runtime                        = module.function.runtime
 }
 
+/* Hopefully no longer needed
 resource "null_resource" "wait_for_function" {
   provisioner "local-exec" {
     command = "sleep 60"
@@ -60,3 +61,4 @@ resource "null_resource" "wait_for_function" {
 
   depends_on = [module.harden_sa]
 }
+*/
