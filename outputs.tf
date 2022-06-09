@@ -15,12 +15,12 @@ output "excludes" {
 }
 
 output "v1_entry_point" {
-  description = "The v1 function entry point"
+  description = "The v1 legacy label function entry point"
   value       = "LabelPubSub"
 }
 
 output "v2_entry_point" {
-  description = "The v2 function entry point"
+  description = "The v2 legacy label function entry point"
   value       = "LabelEvent"
 }
 

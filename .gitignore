@@ -42,3 +42,4 @@ terraform.tfvars
 
 fn.zip
 .envrc
+scratch

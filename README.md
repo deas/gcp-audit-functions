@@ -23,15 +23,23 @@ export GOOGLE_IMPERSONATE_SERVICE_ACCOUNT=your-sa@your-prj-id.iam.gserviceaccoun
 ```
 to get proper access when trying them out.
 
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+### Inputs
+
+No input.
+
 ### Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_excludes"></a> [excludes](#output\_excludes) | Files we want to exlude |
-| <a name="output_path"></a> [path](#output\_path) | The path to the function source |
-| <a name="output_runtime"></a> [runtime](#output\_runtime) | The runtime |
-| <a name="output_v1_entry_point"></a> [v1\_entry\_point](#output\_v1\_entry\_point) | The v1 function entry point |
-| <a name="output_v2_entry_point"></a> [v2\_entry\_point](#output\_v2\_entry\_point) | The v2 function entry point |
+| entry\_points\_v1 | The v1 function entry points provided by this module |
+| excludes | Files we want to exlude |
+| path | The path to the function source |
+| runtime | The runtime |
+| v1\_entry\_point | The v1 legacy label function entry point |
+| v2\_entry\_point | The v2 legacy label function entry point |
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Development
 There are various `Makefile` targets providing entrypoints for CI and steps you might want to do during development.
@@ -77,24 +85,34 @@ cat <<EOF | curl -d @- -X POST -H "Content-Type: application/cloudevents+json" "
 EOF
 ```
 
-Send PubSub payload to Cloud Function via Topic.
+Call Start Function with organization scope on GCP directly.
 
 ```shell
-PROJECT_ID=your-prj-id
-function=$(gcloud --project ${PROJECT_ID} functions list | grep ^audit-label | cut -d " " -f 1)
-gcloud --project ${PROJECT_ID} functions call ${function} --data='{"message": "Hello World!"}'
-gcloud --project ${PROJECT_ID} pubsub topics audit-label --message '{ "fix": "me" }'
+# Grant Function Service Account permission to search, start and stop.
+ORG_ID=your-org-id
+PROJECT_ID=your-project-id
+
+gcloud iam roles create --organization ${ORG_ID} ComputeInstancesLifeCycle --permissions=compute.instances.start,compute.instances.stop,cloudasset.assets.searchAllResources
+
+gcloud organizations add-iam-policy-binding $ORG_ID --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" --role="organizations/$ORG_ID/roles/ComputeInstancesLifeCycle"
+
+# Find deployed function
+function=$(gcloud --project ${PROJECT_ID} functions list | grep ^start.instances | cut -d " " -f 1)
+gcloud --project=${PROJECT_ID} functions call ${function} --region europe-west2 --data='{"data":"'$(echo '
+{
+  "scope": "organizations/'$ORG_ID'",
+  "query": "labels.start_daily:true AND state:TERMINATED",
+  "assetTypes": ["compute.googleapis.com/Instance"]
+}' | base64 -w 0)'"}'
+# gcloud --project ${PROJECT_ID} pubsub topics ${function} --message '{ "fix": "me" }'
 ```
 
-Read Audit Logs from StackDriver
-```shell
-gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog"' --freshness=1h --project ${PROJECT_ID} --format json
-```
+Alternatively, you can use `"scope": "projects/your-project-id"` or on folder level. 
 
-Send PubSub payload to local Start/Stop Function
+Call local Start/Stop Function
 ```shell
 endpoint=http://localhost:8080
-scope=organizations/your-org-id
+scope=organizations/$ORG_ID
 
 echo '{"data": "'$(echo '
 {
@@ -110,6 +128,11 @@ echo '{"data": "'$(echo '
     "assetTypes": ["compute.googleapis.com/Instance"]
 }' | base64 -w 0)'"}' | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
 
+```
+
+Read Audit Logs from StackDriver
+```shell
+gcloud logging read 'protoPayload.@type="type.googleapis.com/google.cloud.audit.AuditLog"' --freshness=1h --project ${PROJECT_ID} --format json
 ```
 
 There is a generic `main` entrypoint for the Go implementations which allows one to call functionality straight from the command line. Try
