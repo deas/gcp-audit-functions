@@ -9,7 +9,7 @@ output "region" {
 }
 
 output "function_name" {
-  value       = module.start_instances.name
+  value       = module.instance_actions.name
   description = "The name of the function created"
 }
 

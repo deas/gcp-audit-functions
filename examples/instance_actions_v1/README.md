@@ -22,12 +22,13 @@ this directory:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| action | Instance action parameters | `map(any)` | <pre>{<br>  "start": {<br>    "query": "labels.start_daily:true AND state:TERMINATED",<br>    "schedule": "0 1 * * *"<br>  },<br>  "stop": {<br>    "query": "labels.stop_daily:true AND state:RUNNING",<br>    "schedule": "0 2 * * *"<br>  }<br>}</pre> | no |
 | org\_id | The organization ID to which resources will be applied. | `string` | `"override in terraform.tfvars"` | no |
 | project\_id | The ID of the project to which resources will be applied. | `string` | n/a | yes |
 | region | The region in which resources will be applied. | `string` | n/a | yes |
-| schedule | The schedule | `string` | `"0 1 * * *"` | no |
-| search | The asset search | `string` | `"{\n  \"scope\": \"organizations/your-org-id\",\n  \"query\": \"labels.start_daily:true AND state:TERMINATED\",\n  \"assetTypes\": [\"compute.googleapis.com/Instance\"]\n}\n"` | no |
+| search\_scope | The scope of the search | `string` | `"projects"` | no |
 | service\_account\_email | The service account email | `string` | `""` | no |
+| time\_zone | The timezone to use in scheduler | `string` | `"Etc/UTC"` | no |
 | vm | VM spec - zone and subnetwork. Null to disable | <pre>object({<br>    zone       = string<br>    subnetwork = string<br>  })</pre> | `null` | no |
 
 ## Outputs

@@ -39,7 +39,7 @@ resource "google_eventarc_trigger" "main" {
 module "audit_label" {
   source      = "../../modules/functions-v2"
   description = "Labels resource with owner information."
-  entry_point = module.function.v2_entry_point
+  entry_point = module.function.entry_points_v2["label"]
   #environment_variables = {
   #  LABEL_KEY = "principal-email"
   #}

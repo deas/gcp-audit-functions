@@ -23,10 +23,11 @@ var (
 		"LabelEvent": function.LabelEvent,
 	}
 	pubsubFunctions map[string]func(context.Context, function.PubSubMessage) error = map[string]func(context.Context, function.PubSubMessage) error{
-		"LabelPubSub":  function.LabelPubSub,
-		"HardenPubSub": function.HardenPubSub,
-		"StartPubSub":  function.StartPubSub,
-		"StopPubSub":   function.StopPubSub,
+		"LabelPubSub":   function.LabelPubSub,
+		"HardenPubSub":  function.HardenPubSub,
+		"ActionsPubSub": function.ActionsPubSub,
+		// "StartPubSub":  function.StartPubSub,
+		// "StopPubSub":   function.StopPubSub,
 	}
 )
 

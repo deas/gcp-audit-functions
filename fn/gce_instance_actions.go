@@ -1,10 +1,5 @@
 package function
 
-/*
-gcloud asset search-all-resources \
-  --scope=organizations/${ORG_ID} \
-  --asset-types=compute.googleapis.com/Instance
-*/
 import (
 	"context"
 	"encoding/json"
@@ -16,6 +11,31 @@ import (
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )
 
+var (
+	actions map[string]func(context.Context, *assetpb.SearchAllResourcesRequest) error = map[string]func(context.Context, *assetpb.SearchAllResourcesRequest) error{
+		"start": SearchStart,
+		"stop":  SearchStop,
+	}
+	/* commands map[string]interface{} = map[string]interface{}{}*/
+)
+
+type ActionsSearch struct {
+	SearchRequest *assetpb.SearchAllResourcesRequest `json:"search"`
+	Action        string                             `json:"action"`
+}
+
+func ActionsPubSub(ctx context.Context, m PubSubMessage) error {
+	logger.Info(ctx, "Got PubSub message")
+	actionsSearch := &ActionsSearch{}
+	log.Println(string(m.Data))
+	err := json.Unmarshal(m.Data, &actionsSearch)
+	if err != nil {
+		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
+	}
+	return actions[actionsSearch.Action](ctx, actionsSearch.SearchRequest)
+}
+
+/*
 func StartPubSub(ctx context.Context, m PubSubMessage) error {
 	logger.Info(ctx, "Got PubSub message")
 	searchRequest := &assetpb.SearchAllResourcesRequest{}
@@ -37,6 +57,7 @@ func StopPubSub(ctx context.Context, m PubSubMessage) error {
 	}
 	return SearchStop(ctx, searchRequest)
 }
+*/
 
 func SearchStart(ctx context.Context, req *assetpb.SearchAllResourcesRequest) error {
 	return Search(ctx, req, Start)

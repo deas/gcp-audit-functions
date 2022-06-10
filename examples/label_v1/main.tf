@@ -45,7 +45,7 @@ module "audit_label" {
   source      = "terraform-google-modules/event-function/google"
   version     = "2.3.0"
   description = "Labels resource with owner information."
-  entry_point = module.function.v1_entry_point
+  entry_point = module.function.entry_point_v1["label"]
   #environment_variables = {
   #  LABEL_KEY = "principal-email"
   #}

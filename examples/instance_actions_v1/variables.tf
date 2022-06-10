@@ -23,24 +23,32 @@ variable "vm" {
   default     = null
 }
 
-variable "search" {
+variable "time_zone" {
   type        = string
-  description = "The asset search"
-  default     = <<EOF
-{
-  "scope": "organizations/your-org-id",
-  "query": "labels.start_daily:true AND state:TERMINATED",
-  "assetTypes": ["compute.googleapis.com/Instance"]
-}
-EOF
+  description = "The timezone to use in scheduler"
+  default     = "Etc/UTC"
 }
 
-variable "schedule" {
+variable "search_scope" {
   type        = string
-  description = "The schedule"
-  default     = "0 1 * * *"
+  description = "The scope of the search"
+  default     = "projects"
 }
 
+variable "action" {
+  type        = map(any)
+  description = "Instance action parameters"
+  default = {
+    "start" = {
+      "schedule" = "0 1 * * *"
+      "query"    = "labels.start_daily:true AND state:TERMINATED"
+    }
+    "stop" = {
+      "schedule" = "0 2 * * *"
+      "query" : "labels.stop_daily:true AND state:RUNNING"
+    }
+  }
+}
 variable "service_account_email" {
   type        = string
   description = "The service account email"

@@ -14,23 +14,19 @@ output "excludes" {
   value       = local.excludes
 }
 
-output "v1_entry_point" {
-  description = "The v1 legacy label function entry point"
-  value       = "LabelPubSub"
-}
-
-output "v2_entry_point" {
-  description = "The v2 legacy label function entry point"
-  value       = "LabelEvent"
+output "entry_points_v2" {
+  description = "The v2 function entry points provided by this module"
+  value = {
+    label = "LabelEvent"
+  }
 }
 
 output "entry_points_v1" {
   description = "The v1 function entry points provided by this module"
   value = {
-    label           = "LabelPubSub"
-    harden_sa       = "HardenPubSub"
-    start_instances = "StartPubSub"
-    stop_instances  = "StopPubSub"
+    label            = "LabelPubSub"
+    harden_sa        = "HardenPubSub"
+    instance_actions = "ActionsPubSub"
   }
 }
 

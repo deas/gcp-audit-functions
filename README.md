@@ -6,7 +6,7 @@ Functionality currently covers:
 
 - Labeling GCE instances on creation
 - Hardening the Compute Default account (revoking `role/editor`)
-- Start and Stop GCE instances based on Asset Search
+- GCE instances instance actions (e.g. start/stop) based on Asset Search
 
 More hopefully coming soon.
 
@@ -33,11 +33,10 @@ No input.
 | Name | Description |
 |------|-------------|
 | entry\_points\_v1 | The v1 function entry points provided by this module |
+| entry\_points\_v2 | The v2 function entry points provided by this module |
 | excludes | Files we want to exlude |
 | path | The path to the function source |
 | runtime | The runtime |
-| v1\_entry\_point | The v1 legacy label function entry point |
-| v2\_entry\_point | The v2 legacy label function entry point |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
@@ -50,7 +49,7 @@ Start local service
 ```shell
 # export FUNCTION_TARGET=LabelPubSub # Not needed atm
 # export GCP_HOUSEKEEPER_READ_ONLY=1 # If you want read only access to GCP 
-export GCP_HOUSEKEEPER_FUNCTION=StartPubSub # Framework workaround atm
+export GCP_HOUSEKEEPER_FUNCTION=ActionsPubSub # Framework workaround atm
 make serve
 ```
 
@@ -92,17 +91,19 @@ Call Start Function with organization scope on GCP directly.
 ORG_ID=your-org-id
 PROJECT_ID=your-project-id
 
-gcloud iam roles create --organization ${ORG_ID} ComputeInstancesLifeCycle --permissions=compute.instances.start,compute.instances.stop,cloudasset.assets.searchAllResources
+gcloud iam roles create --organization ${ORG_ID} ComputeInstancesActions --permissions=compute.instances.start,compute.instances.stop,cloudasset.assets.searchAllResources
 
-gcloud organizations add-iam-policy-binding $ORG_ID --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" --role="organizations/$ORG_ID/roles/ComputeInstancesLifeCycle"
+gcloud organizations add-iam-policy-binding $ORG_ID --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" --role="organizations/$ORG_ID/roles/ComputeInstancesActions"
 
 # Find deployed function
-function=$(gcloud --project ${PROJECT_ID} functions list | grep ^start.instances | cut -d " " -f 1)
+function=$(gcloud --project ${PROJECT_ID} functions list | grep ^instance.actions | cut -d " " -f 1)
 gcloud --project=${PROJECT_ID} functions call ${function} --region europe-west2 --data='{"data":"'$(echo '
-{
-  "scope": "organizations/'$ORG_ID'",
-  "query": "labels.start_daily:true AND state:TERMINATED",
-  "assetTypes": ["compute.googleapis.com/Instance"]
+  "action": "start"
+  "search": {
+    "scope": "organizations/'$ORG_ID'",
+    "query": "labels.start_daily:true AND state:TERMINATED",
+    "assetTypes": ["compute.googleapis.com/Instance"]
+  }
 }' | base64 -w 0)'"}'
 # gcloud --project ${PROJECT_ID} pubsub topics ${function} --message '{ "fix": "me" }'
 ```
@@ -116,18 +117,30 @@ scope=organizations/$ORG_ID
 
 echo '{"data": "'$(echo '
 {
+  "action": "start",
+  "search": {
     "scope": "'$scope'",
     "query": "labels.start_daily:true AND state:TERMINATED",
     "assetTypes": ["compute.googleapis.com/Instance"]
+  }
 }' | base64 -w 0)'"}' | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
 
 echo '{"data": "'$(echo '
 {
+  "action": "stop",
+  "search": {
     "scope": "'$scope'",
     "query": "labels.stop_daily:true AND state:RUNNING",
     "assetTypes": ["compute.googleapis.com/Instance"]
+  }
 }' | base64 -w 0)'"}' | curl -d @- -X POST -H "Content-Type: application/json" "${endpoint}"
+```
 
+Find all compute instances
+```shell
+gcloud asset search-all-resources \
+  --scope=organizations/${ORG_ID} \
+  --asset-types=compute.googleapis.com/Instance
 ```
 
 Read Audit Logs from StackDriver

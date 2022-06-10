@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	commands map[string]func(context.Context, *assetpb.ResourceSearchResult) error = map[string]func(context.Context, *assetpb.ResourceSearchResult) error{
+	instanceActions map[string]func(context.Context, *assetpb.ResourceSearchResult) error = map[string]func(context.Context, *assetpb.ResourceSearchResult) error{
 		"start": function.Start,
 		"stop":  function.Stop,
 	}
@@ -49,7 +49,7 @@ var searchCmd = &cobra.Command{
 				// "cloudresourcemanager.googleapis.com/Project",
 			},
 		}
-		return function.Search(context.Background(), req, commands[viper.GetString("command")])
+		return function.Search(context.Background(), req, instanceActions[viper.GetString("command")])
 	},
 }
 
