@@ -28,19 +28,19 @@ import (
 )
 
 func HardenPubSub(ctx context.Context, m PubSubMessage) error {
-	logger.Info(ctx, fmt.Sprintf("Got PubSub message %s", string(m.Data))) // Automatically decoded from base64
+	Logger.Info(ctx, fmt.Sprintf("Got PubSub message %s", string(m.Data))) // Automatically decoded from base64
 	logentry := &AuditLogEntry{}
 	// logentry := &audit.AuditLog{}
 	// var auditLogEntry AuditLogEntry
 	err := json.Unmarshal(m.Data, &logentry)
 	if err != nil {
-		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
+		Logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
 	}
 	return harden(ctx, *logentry.ProtoPayload, fmt.Sprintf("%s/%s", logentry.ProtoPayload.ServiceName, logentry.ProtoPayload.ResourceName))
 }
 
 func HardenEvent(ctx context.Context, ev event.Event) error {
-	logger.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
+	Logger.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
 	logentry := &AuditLogEntry{}
 	if err := ev.DataAs(logentry); err != nil {
 		return fmt.Errorf("Error parsing event payload : %w", err)

@@ -25,12 +25,12 @@ type ActionsSearch struct {
 }
 
 func ActionsPubSub(ctx context.Context, m PubSubMessage) error {
-	logger.Info(ctx, "Got PubSub message")
+	Logger.Info(ctx, "Got PubSub message")
 	actionsSearch := &ActionsSearch{}
 	log.Println(string(m.Data))
 	err := json.Unmarshal(m.Data, &actionsSearch)
 	if err != nil {
-		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
+		Logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
 	}
 	return actions[actionsSearch.Action](ctx, actionsSearch.SearchRequest)
 }

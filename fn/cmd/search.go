@@ -3,11 +3,7 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
-	"log"
-	"os"
 
-	"cdr.dev/slog"
 	function "github.com/deas/gcp-audit-label/fn"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -31,11 +27,7 @@ var searchCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// cmd.Help()
 		viper.BindPFlags(cmd.Flags())
-		os.Setenv(fmt.Sprintf("%s_%s", function.EnvPrefix, "LOGGER"), "human")
-		logger := function.NewLogger()
-		ctx := context.Background()
-		log.SetOutput(slog.Stdlib(ctx, logger).Writer())
-		logger.Info(ctx, "Starting search")
+		// function.Logger.Info(context.Background(), "Starting search")
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if viper.GetString("scope") == "" {

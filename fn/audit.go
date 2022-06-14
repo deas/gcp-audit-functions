@@ -1,20 +1,5 @@
 package function
 
-import (
-	"fmt"
-	"os"
-
-	"cdr.dev/slog"
-	"cdr.dev/slog/sloggers/sloghuman"
-	"cdr.dev/slog/sloggers/slogstackdriver"
-)
-
-var (
-	readOnly  bool
-	EnvPrefix = "GCP_HOUSEKEEPER"
-	logger    slog.Logger
-)
-
 // https://gist.github.com/salrashid123/62178224324ccbc80a358920d5281a60
 
 // AuditLogEntry represents a LogEntry as described at
@@ -38,12 +23,4 @@ type AuditLogProtoPayload struct {
 // https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage
 type PubSubMessage struct {
 	Data []byte `json:"data"`
-}
-
-func NewLogger() slog.Logger {
-	if os.Getenv(fmt.Sprintf("%s_%s", EnvPrefix, "LOGGER")) == "human" {
-		return slog.Make(sloghuman.Sink(os.Stdout))
-	} else {
-		return slog.Make(slogstackdriver.Sink(os.Stdout))
-	}
 }

@@ -132,7 +132,6 @@ module "instance_actions" {
   entry_point = module.function.entry_points_v1["instance_actions"]
   #environment_variables = {
   #  LABEL_KEY = "principal-email"
-
   #}
   event_trigger = {
     event_type = "google.pubsub.topic.publish"

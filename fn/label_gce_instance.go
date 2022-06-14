@@ -22,29 +22,28 @@ var (
 )
 
 func init() {
-	logger = NewLogger()
 	var err error
 	client, err = compute.NewInstancesRESTClient(context.Background(), NewOpts()...)
 	if err != nil {
-		logger.Fatal(context.Background(), fmt.Sprintf("Failed to create instances client : %v", err))
+		Logger.Fatal(context.Background(), fmt.Sprintf("Failed to create instances client : %v", err))
 	}
 	_, readOnly = os.LookupEnv(fmt.Sprintf("%s_%s", EnvPrefix, "READ_ONLY"))
 }
 
 func LabelPubSub(ctx context.Context, m PubSubMessage /* pubsub.Message*/) error {
-	logger.Info(ctx, "Got PubSub message") // , m.ID /*string(m.Data)*/)) // Automatically decoded from base64
+	Logger.Info(ctx, "Got PubSub message") // , m.ID /*string(m.Data)*/)) // Automatically decoded from base64
 	logentry := &AuditLogEntry{}
 	// logentry := &audit.AuditLog{}
 	// var auditLogEntry AuditLogEntry
 	err := json.Unmarshal(m.Data, &logentry)
 	if err != nil {
-		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
+		Logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to audit log %v\n", err))
 	}
 	return label(ctx, *logentry.ProtoPayload, fmt.Sprintf("%s/%s", logentry.ProtoPayload.ServiceName, logentry.ProtoPayload.ResourceName))
 }
 
 func LabelEvent(ctx context.Context, ev event.Event) error {
-	logger.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
+	Logger.Info(ctx, fmt.Sprintf("Got CloudEvent %s with data %s", ev.ID(), string(ev.Data())))
 	logentry := &AuditLogEntry{}
 	if err := ev.DataAs(logentry); err != nil {
 		return fmt.Errorf("error parsing event payload : %w", err)
@@ -54,12 +53,12 @@ func LabelEvent(ctx context.Context, ev event.Event) error {
 
 // Receives GCE instance creation Audit Logs, and adds a `creator` label to the instance.
 func label(ctx context.Context, payload AuditLogProtoPayload, subject string) error {
-	logger.Info(ctx, fmt.Sprintf("Got MethodName %s", payload.MethodName))
+	Logger.Info(ctx, fmt.Sprintf("Got MethodName %s", payload.MethodName))
 
 	creator, ok := payload.AuthenticationInfo["principalEmail"]
 	if !ok {
 		err := fmt.Errorf("principalEmail not found in cloud event payload: %v", payload)
-		logger.Info(ctx, fmt.Sprintf("Creator email not found: %s", err))
+		Logger.Info(ctx, fmt.Sprintf("Creator email not found: %s", err))
 		return err
 	}
 
@@ -92,7 +91,7 @@ func label(ctx context.Context, payload AuditLogProtoPayload, subject string) er
 	}
 	if v, ok := inst.Labels["creator"]; ok {
 		// Instance already has a creator label.
-		logger.Info(ctx, fmt.Sprintf("Instance %s already labeled with creator: %s", instance, v))
+		Logger.Info(ctx, fmt.Sprintf("Instance %s already labeled with creator: %s", instance, v))
 		return nil
 	}
 
@@ -112,9 +111,9 @@ func label(ctx context.Context, payload AuditLogProtoPayload, subject string) er
 		if err != nil {
 			return err // log.Fatalf("Could not label GCE instance: %s", err)
 		}
-		logger.Info(ctx, fmt.Sprintf("Creator label added to %s in operation %v", instance, op))
+		Logger.Info(ctx, fmt.Sprintf("Creator label added to %s in operation %v", instance, op))
 	} else {
-		logger.Info(ctx, fmt.Sprintf("Creator label not added to %s - read only", instance))
+		Logger.Info(ctx, fmt.Sprintf("Creator label not added to %s - read only", instance))
 	}
 	return nil
 }

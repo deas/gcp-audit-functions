@@ -8,7 +8,6 @@ import (
 	"os"
 	"strings"
 
-	"cdr.dev/slog"
 	"github.com/GoogleCloudPlatform/functions-framework-go/funcframework"
 	"github.com/cloudevents/sdk-go/v2/event"
 	function "github.com/deas/gcp-audit-label/fn"
@@ -26,8 +25,6 @@ var (
 		"LabelPubSub":   function.LabelPubSub,
 		"HardenPubSub":  function.HardenPubSub,
 		"ActionsPubSub": function.ActionsPubSub,
-		// "StartPubSub":  function.StartPubSub,
-		// "StopPubSub":   function.StopPubSub,
 	}
 )
 
@@ -40,10 +37,7 @@ var rootCmd = &cobra.Command{
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// cmd.Help()
-		os.Setenv(fmt.Sprintf("%s_%s", function.EnvPrefix, "LOGGER"), "human")
-		logger := function.NewLogger()
 		ctx := context.Background()
-		log.SetOutput(slog.Stdlib(ctx, logger).Writer())
 		// Serving multiple functions locally from a single server instance #109
 		// https://github.com/GoogleCloudPlatform/functions-framework-go/issues/109
 		fn := viper.GetString("function")
@@ -55,7 +49,7 @@ var rootCmd = &cobra.Command{
 		} else {
 			funcframework.RegisterCloudEventFunctionContext(ctx, "/", eventFunctions[fn])
 		}
-		logger.Info(ctx, fmt.Sprintf("Starting function framework service for function %s", fn))
+		function.Logger.Info(ctx, fmt.Sprintf("Starting function framework service for function %s", fn))
 		if err := funcframework.Start(viper.GetString("port")); err != nil {
 			log.Fatal(ctx, "funcframework.Start") //: %v\n", err)
 		}
