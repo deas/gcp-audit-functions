@@ -19,7 +19,8 @@ var (
 	debug bool
 	// TODO: Should probably do reflection?
 	eventFunctions map[string]func(context.Context, event.Event) error = map[string]func(context.Context, event.Event) error{
-		"LabelEvent": function.LabelEvent,
+		"LabelEvent":   function.LabelEvent,
+		"ActionsEvent": function.ActionsEvent,
 	}
 	pubsubFunctions map[string]func(context.Context, function.PubSubMessage) error = map[string]func(context.Context, function.PubSubMessage) error{
 		"LabelPubSub":   function.LabelPubSub,

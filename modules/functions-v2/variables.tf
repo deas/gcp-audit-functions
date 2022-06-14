@@ -1,7 +1,7 @@
 # Borrowed from terraform-google-modules/terraform-google-event-function/master/variables.tf
 variable "available_memory_mb" {
-  type        = number
-  default     = 256
+  type        = string
+  default     = "256Mi"
   description = "The amount of memory in megabytes allotted for the function to use."
 }
 
@@ -22,11 +22,29 @@ variable "environment_variables" {
   description = "A set of key/value environment variable pairs to assign to the function."
 }
 
-variable "event_trigger" {
+variable "trigger" {
   type        = string
   description = "The resource name of the Eventarc trigger."
+  default     = null
 }
 
+variable "event_type" {
+  type        = string
+  description = "The event type to subscribe to."
+  default     = null
+}
+
+variable "pubsub_topic" {
+  type        = string
+  description = "The pubsub trigger topic."
+  default     = null
+}
+
+variable "retry_policy" {
+  type        = string
+  description = "The retry policy of the function."
+  default     = "RETRY_POLICY_RETRY"
+}
 variable "trigger_http" {
   type        = bool
   default     = null
@@ -106,7 +124,7 @@ variable "bucket_labels" {
 
 variable "service_account_email" {
   type        = string
-  default     = ""
+  default     = null
   description = "The service account to run the function as."
 }
 

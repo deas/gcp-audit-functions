@@ -43,13 +43,13 @@ module "audit_label" {
   #environment_variables = {
   #  LABEL_KEY = "principal-email"
   #}
-  event_trigger                  = google_eventarc_trigger.main.name
+  trigger                        = google_eventarc_trigger.main.name
   name                           = "${local.name}-${random_pet.main.id}"
   project_id                     = var.project_id
   region                         = var.region
   source_directory               = module.function.path
   files_to_exclude_in_source_dir = module.function.excludes
-  available_memory_mb            = "128"
+  available_memory_mb            = "128Mi"
   runtime                        = module.function.runtime
 }
 

@@ -7,6 +7,7 @@ import (
 	"log"
 
 	asset "cloud.google.com/go/asset/apiv1"
+	"github.com/cloudevents/sdk-go/v2/event"
 	"google.golang.org/api/iterator"
 	assetpb "google.golang.org/genproto/googleapis/cloud/asset/v1"
 )
@@ -24,40 +25,53 @@ type ActionsSearch struct {
 	Action        string                             `json:"action"`
 }
 
+func processAction(ctx context.Context, actionsSearch ActionsSearch) error {
+	action := actions[actionsSearch.Action]
+	Logger.Debug(ctx, fmt.Sprintf("Got action %s, search %v", actionsSearch.Action, actionsSearch))
+	if action != nil {
+		return action(ctx, actionsSearch.SearchRequest)
+	} else {
+		return fmt.Errorf("got no action %s", actionsSearch.Action)
+	}
+}
+
 func ActionsPubSub(ctx context.Context, m PubSubMessage) error {
 	Logger.Info(ctx, "Got PubSub message")
 	actionsSearch := &ActionsSearch{}
-	log.Println(string(m.Data))
-	err := json.Unmarshal(m.Data, &actionsSearch)
-	if err != nil {
+	Logger.Info(ctx, string(m.Data))
+	if err := json.Unmarshal(m.Data, &actionsSearch); err != nil {
 		Logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
 	}
-	return actions[actionsSearch.Action](ctx, actionsSearch.SearchRequest)
+	if err := processAction(ctx, *actionsSearch); err != nil {
+		Logger.Error(ctx, err.Error())
+	}
+	// We don't want retries atm
+	return nil
 }
 
-/*
-func StartPubSub(ctx context.Context, m PubSubMessage) error {
-	logger.Info(ctx, "Got PubSub message")
-	searchRequest := &assetpb.SearchAllResourcesRequest{}
-	log.Println(string(m.Data))
-	err := json.Unmarshal(m.Data, &searchRequest)
-	if err != nil {
-		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
+func ActionsEvent(ctx context.Context, ev event.Event) error {
+	Logger.Info(ctx, fmt.Sprintf("Got CloudEvent : id = %s", ev.Context.GetID())) // %+v", ev))
+	// TODO
+	eventData := &PubSubEventData{}
+	if err := ev.DataAs(eventData); err != nil {
+		return fmt.Errorf("error parsing event payload : %w", err)
 	}
-	return SearchStart(ctx, searchRequest)
-}
-
-func StopPubSub(ctx context.Context, m PubSubMessage) error {
-	logger.Info(ctx, "Got PubSub message")
-	searchRequest := &assetpb.SearchAllResourcesRequest{}
-	log.Println(string(m.Data))
-	err := json.Unmarshal(m.Data, &searchRequest)
-	if err != nil {
-		logger.Info(ctx, fmt.Sprintf("Error: could not unmarshall to search request %v\n", err))
+	actionsSearch := &ActionsSearch{}
+	json.Unmarshal(eventData.Message.Data, &actionsSearch)
+	// This works if we call the function directly
+	/*
+		if err := ev.DataAs(actionsSearch); err != nil {
+			return fmt.Errorf("error parsing event payload : %w", err)
+		}
+	*/
+	Logger.Info(ctx, fmt.Sprintf("actionsSearch = %+v", actionsSearch))
+	if err := processAction(ctx, *actionsSearch); err != nil {
+		Logger.Error(ctx, err.Error())
 	}
-	return SearchStop(ctx, searchRequest)
+	// We don't want retries atm
+	return nil
+	// return processAction(ctx, *actionsSearch)
 }
-*/
 
 func SearchStart(ctx context.Context, req *assetpb.SearchAllResourcesRequest) error {
 	return Search(ctx, req, Start)
@@ -90,7 +104,7 @@ func Search(ctx context.Context, req *assetpb.SearchAllResourcesRequest, fn func
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 		err = fn(ctx, resource)
 		if err != nil {

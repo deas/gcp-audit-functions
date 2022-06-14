@@ -17,10 +17,3 @@ type AuditLogProtoPayload struct {
 	ResourceName       string                 `json:"resourceName"`
 	AuthenticationInfo map[string]interface{} `json:"authenticationInfo"`
 }
-
-// PubSubMessage is the payload of a Pub/Sub event - Save a module for the moment
-// See the documentation for more details:
-// https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage
-type PubSubMessage struct {
-	Data []byte `json:"data"`
-}

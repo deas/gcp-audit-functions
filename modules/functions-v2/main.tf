@@ -58,14 +58,19 @@ resource "google_storage_bucket_object" "main" {
   bucket              = var.create_bucket ? google_storage_bucket.main[0].name : var.bucket_name
   source              = data.archive_file.main.output_path
   content_disposition = "attachment"
-  content_encoding    = "gzip"
-  content_type        = "application/zip"
+  # TODO: The following blows up cloud build and gsutil cp downloads 0 bytes.
+  # Even more surprising, this is not an issue with v1 functions - at least
+  # cloud build works
+  # content_encoding    = "gzip"
+  content_type = "application/zip"
 }
 
 resource "google_cloudfunctions2_function" "main" {
-  provider    = google-beta
-  name        = var.name
-  location    = var.region #"us-central1"
+  provider = google-beta
+  name     = var.name
+  project  = var.project_id
+
+  location    = var.region
   description = var.description
 
   build_config {
@@ -81,9 +86,10 @@ resource "google_cloudfunctions2_function" "main" {
   }
 
   service_config {
+    service_account_email          = var.service_account_email
     max_instance_count             = var.max_instances
     min_instance_count             = 1
-    available_memory               = var.available_memory_mb # "256M"
+    available_memory               = var.available_memory_mb # "256Mi"
     timeout_seconds                = var.timeout_s
     environment_variables          = var.environment_variables
     ingress_settings               = var.ingress_settings # "ALLOW_INTERNAL_ONLY"
@@ -91,11 +97,11 @@ resource "google_cloudfunctions2_function" "main" {
   }
 
   event_trigger {
-    trigger        = var.event_trigger
-    trigger_region = var.region #"us-central1"
-    #  event_type - (Optional) Required. The type of event to observe.
-    #  event_type = "google.cloud.pubsub.topic.v1.messagePublished"
-    #  pubsub_topic = google_pubsub_topic.sub.id
-    retry_policy = "RETRY_POLICY_RETRY"
+    trigger               = var.trigger
+    trigger_region        = var.region
+    event_type            = var.event_type
+    pubsub_topic          = var.pubsub_topic
+    retry_policy          = var.retry_policy
+    service_account_email = var.service_account_email
   }
 }

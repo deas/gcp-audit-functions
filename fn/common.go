@@ -33,3 +33,15 @@ func NewLogger() slog.Logger {
 		return slog.Make(sloghuman.Sink(os.Stdout))
 	}
 }
+
+// PubSubMessage is the payload of a Pub/Sub event - Save a module for the moment
+// See the documentation for more details:
+// https://cloud.google.com/pubsub/docs/reference/rest/v1/PubsubMessage
+type PubSubMessage struct {
+	Data []byte `json:"data"`
+}
+
+// Cloud Scheduler -> PubSub -> Cloud Event Function (v2) Glue
+type PubSubEventData struct {
+	Message PubSubMessage `json:"message"`
+}

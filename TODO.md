@@ -6,6 +6,7 @@
 - [ ] Harden Default Compute Service Account (Revoke Editor)
 - [ ] Stricter naming of terraform resources/modules
 - [ ] Do org level instance actions role in `terraform`
+- [ ] Error Handling/Retries (around actions function)
 
 ### In Progress
 - [ ] CFT DevTools/E2E-Tests/Terratest

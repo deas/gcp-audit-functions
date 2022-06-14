@@ -73,13 +73,13 @@ message=test/audit-compute-instance-create.json
 endpoint=http://localhost:8080
 cat <<EOF | curl -d @- -X POST -H "Content-Type: application/cloudevents+json" "${endpoint}" \
 {
-	"specversion" : "1.0",
-	"type" : "example.com.cloud.event",
-	"source" : "https://example.com/cloudevents/pull",
-	"subject" : "123",
-	"id" : "A234-1234-1234",
-	"time" : "2018-04-05T17:31:00Z",
-	"data" : $(cat $message)
+        "specversion" : "1.0",
+        "type" : "example.com.cloud.event",
+        "source" : "https://example.com/cloudevents/pull",
+        "subject" : "123",
+        "id" : "A234-1234-1234",
+        "time" : "2018-04-05T17:31:00Z",
+        "data" : $(cat $message)
 }
 EOF
 ```
@@ -88,24 +88,35 @@ Call Start Function with organization scope on GCP directly.
 
 ```shell
 # Grant Function Service Account permission to search, start and stop.
-ORG_ID=your-org-id
 PROJECT_ID=your-project-id
 
 gcloud iam roles create --organization ${ORG_ID} ComputeInstancesActions --permissions=compute.instances.start,compute.instances.stop,cloudasset.assets.searchAllResources
 
 gcloud organizations add-iam-policy-binding $ORG_ID --member="serviceAccount:${PROJECT_ID}@appspot.gserviceaccount.com" --role="organizations/$ORG_ID/roles/ComputeInstancesActions"
 
-# Find deployed function
+# Find deployed function (list does not appear to show v2 functions?)
 function=$(gcloud --project ${PROJECT_ID} functions list | grep ^instance.actions | cut -d " " -f 1)
+# Call function directly
 gcloud --project=${PROJECT_ID} functions call ${function} --region europe-west2 --data='{"data":"'$(echo '
-  "action": "start"
+{
+  "action": "start",
   "search": {
     "scope": "organizations/'$ORG_ID'",
     "query": "labels.start_daily:true AND state:TERMINATED",
     "assetTypes": ["compute.googleapis.com/Instance"]
   }
 }' | base64 -w 0)'"}'
-# gcloud --project ${PROJECT_ID} pubsub topics ${function} --message '{ "fix": "me" }'
+
+# Call function via pubsub
+gcloud --project ${PROJECT_ID} pubsub topics publish ${function} --message '
+{
+  "action": "start",
+  "search": {
+    "scope": "organizations/'$ORG_ID'",
+    "query": "labels.start_daily:true AND state:TERMINATED",
+    "assetTypes": ["compute.googleapis.com/Instance"]
+  }
+}'
 ```
 
 Alternatively, you can use `"scope": "projects/your-project-id"` or on folder level. 
@@ -157,6 +168,8 @@ to see what is available.
 # Known Issues
 - Go workspaces are recommended for best DX with `gopls` : [x/tools/gopls: support multi-module workspaces #32394](https://github.com/golang/go/issues/32394) / [Setting up your workspace](https://github.com/golang/tools/blob/master/gopls/doc/workspace.md#go-workspaces-go-118)
 - [Serving multiple functions locally from a single server instance #109](https://github.com/GoogleCloudPlatform/functions-framework-go/issues/109)
+- Cloud Scheduler can invoke v2 Functions via PubSub "only". This introduces slightly ugly glue code and/or branching 
+
 # References
 - [Functions Framework for Go](https://github.com/GoogleCloudPlatform/functions-framework-go)
 - [Go SDK for CloudEvents](https://github.com/cloudevents/sdk-go).

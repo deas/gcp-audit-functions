@@ -17,7 +17,8 @@ output "excludes" {
 output "entry_points_v2" {
   description = "The v2 function entry points provided by this module"
   value = {
-    label = "LabelEvent"
+    label            = "LabelEvent"
+    instance_actions = "ActionsEvent"
   }
 }
 
