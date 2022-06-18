@@ -1,0 +1,12 @@
+{
+  "params": {
+    "label": "startstop",
+    "timezone": "Europe/Berlin"
+  },
+  "action": "start-stop",
+  "search": {
+    "scope": "organizations/your-org-id",
+    "query": "labels.start_daily:true AND state:TERMINATED",
+    "assetTypes": ["compute.googleapis.com/Instance"]
+  }
+}
