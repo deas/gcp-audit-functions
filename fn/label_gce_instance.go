@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 
@@ -16,19 +15,6 @@ import (
 	// https://gist.github.com/salrashid123/62178224324ccbc80a358920d5281a60
 	"google.golang.org/protobuf/proto"
 )
-
-var (
-	client *compute.InstancesClient
-)
-
-func init() {
-	var err error
-	client, err = compute.NewInstancesRESTClient(context.Background(), NewOpts()...)
-	if err != nil {
-		Logger.Fatal(context.Background(), fmt.Sprintf("Failed to create instances client : %v", err))
-	}
-	_, readOnly = os.LookupEnv(fmt.Sprintf("%s_%s", EnvPrefix, "READ_ONLY"))
-}
 
 func LabelPubSub(ctx context.Context, m PubSubMessage /* pubsub.Message*/) error {
 	Logger.Info(ctx, "Got PubSub message") // , m.ID /*string(m.Data)*/)) // Automatically decoded from base64
@@ -81,11 +67,17 @@ func label(ctx context.Context, payload AuditLogProtoPayload, subject string) er
 
 	// Get the newly-created VM instance's label fingerprint
 	// This is a requirement of the Compute Engine API and avoids duplicate labels
+	client, err := compute.NewInstancesRESTClient(ctx, Opts...) // NewOpts()...)
+	if err != nil {
+		return err
+	}
+
 	inst, err := client.Get(ctx, &computepb.GetInstanceRequest{
 		Project:  project,
 		Zone:     zone,
 		Instance: instance,
 	})
+
 	if err != nil {
 		return fmt.Errorf("could not retrieve GCE instance: %s", err)
 	}

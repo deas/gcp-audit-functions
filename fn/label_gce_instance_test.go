@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	compute "cloud.google.com/go/compute/apiv1"
 	"github.com/cloudevents/sdk-go/v2/event"
 	"google.golang.org/api/option"
 	computepb "google.golang.org/genproto/googleapis/cloud/compute/v1"
@@ -121,10 +120,13 @@ func TestLabelGceInstance(t *testing.T) {
 			defer fakeserver.Close()
 
 			var err error
-			client, err = compute.NewInstancesRESTClient(context.Background(), option.WithEndpoint(fakeserver.URL), option.WithoutAuthentication())
+			Opts = []option.ClientOption{
+				option.WithEndpoint(fakeserver.URL),
+				option.WithoutAuthentication()}
+			/* client, err = compute.NewInstancesRESTClient(context.Background(), option.WithEndpoint(fakeserver.URL), option.WithoutAuthentication())
 			if err != nil {
 				t.Fatalf("Failed to create mock client: %s", err)
-			}
+			} */
 			e := event.New()
 			e.SetSubject("compute.googleapis.com/projects/PROJECT/zones/ZONE/instances/INSTANCE")
 			e.SetType("google.cloud.audit.log.v1.written")

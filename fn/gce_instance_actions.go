@@ -164,7 +164,7 @@ func Search(ctx context.Context,
 ) error {
 	// Unsupported field: 'assetType'. Supported fields include: 'name', 'displayName', 'description', 'location', 'networkTags', 'project', 'folders', 'organization', 'parentAssetType', 'parentFullResourceName', 'labels', 'labels.<key>', 'kmsKey', 'createTime', 'updateTime', 'state', 'tagKeys', 'tagValues', 'tagValueIds'. For more details on how to construct a query, please read: https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query.
 	Logger.Info(ctx, fmt.Sprintf("Got search request %v", req))
-	client, err := asset.NewClient(ctx)
+	client, err := asset.NewClient(ctx, Opts...)
 	if err != nil {
 		return fmt.Errorf("asset.NewClient: %v", err)
 	}
@@ -178,7 +178,7 @@ func Search(ctx context.Context,
 		if err != nil {
 			return err
 		}
-		Logger.Info(ctx, fmt.Sprintf("Got resource %v", resource))
+		// Logger.Info(ctx, fmt.Sprintf("Got resource %v", resource))
 
 		err = fn(ctx, resource, params)
 		if err != nil {

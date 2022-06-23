@@ -2,6 +2,7 @@ package function
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -23,6 +24,7 @@ func init() {
 	ctx := context.Background()
 	log.SetOutput(slog.Stdlib(ctx, Logger).Writer())
 	log.Print("Logging initialized")
+	_, readOnly = os.LookupEnv(fmt.Sprintf("%s_%s", EnvPrefix, "READ_ONLY"))
 }
 
 func NewLogger() slog.Logger {
